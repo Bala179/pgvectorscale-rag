@@ -1,7 +1,10 @@
+import json
 import logging
+import logging.config
 import os
 from datetime import timedelta
 from functools import lru_cache
+import pathlib
 from typing import Optional
 
 from dotenv import load_dotenv
@@ -12,9 +15,11 @@ load_dotenv(dotenv_path="./.env")
 
 def setup_logging():
     """Configure basic logging for the application."""
-    logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-    )
+    config_file = pathlib.Path("config/logging_configs/config.json")
+    with open(config_file) as f_in:
+        config = json.load(f_in)
+
+    logging.config.dictConfig(config)
 
 
 class LLMSettings(BaseModel):

@@ -24,6 +24,7 @@ class VectorStore:
             self.vector_settings.embedding_dimensions,
             time_partition_interval=self.vector_settings.time_partition_interval,
         )
+        self.logger = logging.getLogger('pgvectorscale')
 
     def get_embedding(self, text: str) -> List[float]:
         """
@@ -46,7 +47,7 @@ class VectorStore:
             .embedding
         )
         elapsed_time = time.time() - start_time
-        logging.info(f"Embedding generated in {elapsed_time:.3f} seconds")
+        self.logger.info(f"Embedding generated in {elapsed_time:.3f} seconds")
         return embedding
 
     def create_tables(self) -> None:
@@ -71,7 +72,7 @@ class VectorStore:
         """
         records = df.to_records(index=False)
         self.vec_client.upsert(list(records))
-        logging.info(
+        self.logger.info(
             f"Inserted {len(df)} records into {self.vector_settings.table_name}"
         )
 
@@ -144,7 +145,7 @@ class VectorStore:
         results = self.vec_client.search(query_embedding, **search_args)
         elapsed_time = time.time() - start_time
 
-        logging.info(f"Vector search completed in {elapsed_time:.3f} seconds")
+        self.logger.info(f"Vector search completed in {elapsed_time:.3f} seconds")
 
         if return_dataframe:
             return self._create_dataframe_from_results(results)
@@ -212,14 +213,14 @@ class VectorStore:
 
         if delete_all:
             self.vec_client.delete_all()
-            logging.info(f"Deleted all records from {self.vector_settings.table_name}")
+            self.logger.info(f"Deleted all records from {self.vector_settings.table_name}")
         elif ids:
             self.vec_client.delete_by_ids(ids)
-            logging.info(
+            self.logger.info(
                 f"Deleted {len(ids)} records from {self.vector_settings.table_name}"
             )
         elif metadata_filter:
             self.vec_client.delete_by_metadata(metadata_filter)
-            logging.info(
+            self.logger.info(
                 f"Deleted records matching metadata filter from {self.vector_settings.table_name}"
             )

@@ -1,5 +1,7 @@
 from datetime import datetime
+import logging
 
+from openai import RateLimitError
 import pandas as pd
 from database.vector_store import VectorStore
 from timescale_vector.client import uuid_from_time
@@ -46,8 +48,11 @@ def prepare_record(row):
         }
     )
 
-
-records_df = df.apply(prepare_record, axis=1)
+logger = logging.getLogger('pgvectorscale')
+try:
+    records_df = df.apply(prepare_record, axis=1)
+except RateLimitError:
+    logger.exception("OpenAI Rate Limit Exceeded")
 
 # Create tables and insert data
 vec.create_tables()
