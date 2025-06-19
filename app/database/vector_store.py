@@ -84,7 +84,7 @@ class VectorStore:
         predicates: Optional[client.Predicates] = None,
         time_range: Optional[Tuple[datetime, datetime]] = None,
         return_dataframe: bool = True,
-    ) -> Union[List[Tuple[Any, ...]], pd.DataFrame]:
+    ) -> pd.DataFrame:
         """
         Query the vector database for similar embeddings based on input text.
 
